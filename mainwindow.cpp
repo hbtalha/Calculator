@@ -117,9 +117,18 @@ void MainWindow::digitClicked(QAbstractButton* button)
 
 void MainWindow::operatorClicked(QAbstractButton* button)
 {
+    QString str = ui->lineEdit->text();
+
+    if(str.endsWith("."))
+    {
+        str.chop(1);
+
+        ui->lineEdit->setText(str);
+    }
+
     if(unary_op)
     {
-        calculate(ui->lineEdit->text().toDouble(), oper);
+        calculate(str.toDouble(), oper);
 
         ui->lineEdit_2->setText(ui->lineEdit_2->text() + " " + button->text() + " ");
 
@@ -130,7 +139,7 @@ void MainWindow::operatorClicked(QAbstractButton* button)
     }
     else if(equal_done)
     {
-        ui->lineEdit_2->setText(ui->lineEdit->text() + " " + button->text() + " ");
+        ui->lineEdit_2->setText(str + " " + button->text() + " ");
 
         equal_done = false;
         oper = button->text();
@@ -147,9 +156,9 @@ void MainWindow::operatorClicked(QAbstractButton* button)
     }
     else if(after_oper)
     {
-        calculate(ui->lineEdit->text().toDouble(), oper);
+        calculate(str.toDouble(), oper);
 
-        ui->lineEdit_2->setText(ui->lineEdit_2->text() + ui->lineEdit->text() + " " + button->text() + " ");
+        ui->lineEdit_2->setText(ui->lineEdit_2->text() + str + " " + button->text() + " ");
         ui->lineEdit->setText(QString::number(total));
 
         oper = button->text();
@@ -157,13 +166,13 @@ void MainWindow::operatorClicked(QAbstractButton* button)
     else if( ! lineEdit_empty() )
     {
         if(ui->lineEdit_2->text().isEmpty())
-            ui->lineEdit_2->setText(ui->lineEdit->text());
+            ui->lineEdit_2->setText(str);
 
-        ui->lineEdit_2->setText(ui->lineEdit->text() + " " + button->text() + " ");
+        ui->lineEdit_2->setText(str + " " + button->text() + " ");
 
         oper = button->text();
 
-        calculate(ui->lineEdit->text().toDouble(), oper);
+        calculate(str.toDouble(), oper);
 
     }
 
@@ -242,9 +251,17 @@ void MainWindow::on_equals_clicked()
 {
     static QString right_operand;
 
+    QString str = ui->lineEdit->text();
+
+    if(str.endsWith("."))
+    {
+        str.chop(1);
+        ui->lineEdit->setText(str);
+    }
+
     if(! equal_done )
     {
-        right_operand = ui->lineEdit->text();
+        right_operand = str;
     }
 
     if( equal_done )
@@ -259,7 +276,7 @@ void MainWindow::on_equals_clicked()
     }
     else
     {
-        calculate(ui->lineEdit->text().toDouble(), oper);
+        calculate(str.toDouble(), oper);
 
         if(unary_op)
         {
