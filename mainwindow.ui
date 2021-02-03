@@ -667,26 +667,6 @@ background-color: #666;
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_3">
-    <property name="geometry">
-     <rect>
-      <x>5</x>
-      <y>10</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_4">
-    <property name="geometry">
-     <rect>
-      <x>5</x>
-      <y>40</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -703,8 +683,8 @@ background-color: #666;
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="digits"/>
   <buttongroup name="operators"/>
   <buttongroup name="unary_operators"/>
+  <buttongroup name="digits"/>
  </buttongroups>
 </ui>
