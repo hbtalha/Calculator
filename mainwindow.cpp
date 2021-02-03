@@ -33,17 +33,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lineEdit_2->setAlignment(Qt::AlignRight);
     ui->lineEdit_2->setFrame(false);
 
-    ui->lineEdit_3->setReadOnly(true);
-    ui->lineEdit_3->setAlignment(Qt::AlignRight);
-    ui->lineEdit_3->setStyleSheet("color:white;");
-    ui->lineEdit_4->setReadOnly(true);
-    ui->lineEdit_4->setAlignment(Qt::AlignRight);
-    ui->lineEdit_4->setStyleSheet("color:white;");
-
-    /* Used for debugging */
-    ui->lineEdit_3->setVisible(false);
-    ui->lineEdit_4->setVisible(false);
-
     ui->change_sign->setText(tr("\302\261"));
     ui->power_2->setText(tr("x\u00B2"));
     ui->times->setText(tr("\303\227"));
@@ -226,6 +215,8 @@ void MainWindow::unaryOperatorClicked(QAbstractButton* button)
         {
             ui->lineEdit_2->setText(s_str);
 
+            s_current_text = "";
+
             total = 0;
 
             // ui->lineEdit->setText(QString::number(total));
@@ -234,6 +225,9 @@ void MainWindow::unaryOperatorClicked(QAbstractButton* button)
         }
         else if(unary_op)
         {
+            qDebug() << s_str;
+            qDebug() << "here";
+
             s_str = str_op + s_str + ")";
 
             ui->lineEdit_2->setText(s_current_text + s_str);
@@ -409,7 +403,6 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
     case Qt::Key_Period:
         digitClicked(ui->dot);
         break;
-
 
     case Qt::Key_Plus:
         operatorClicked(ui->plus);
