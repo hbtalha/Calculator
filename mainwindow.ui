@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>265</width>
-    <height>459</height>
+    <height>434</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -683,8 +683,8 @@ background-color: #666;
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="operators"/>
   <buttongroup name="unary_operators"/>
+  <buttongroup name="operators"/>
   <buttongroup name="digits"/>
  </buttongroups>
 </ui>
