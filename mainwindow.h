@@ -43,6 +43,8 @@ private:
     bool lineEdit_empty();
     void calculate(double rigt_operand, QString const& oper);
     void clearAll();
+    void cantDivideByZero();
+    void restoreFromDivisionByZero();
 
     QString oper;
     QString text_up_an_operator;
@@ -52,6 +54,7 @@ private:
     bool no_calc;
     bool equal_done;
     bool unary_op;
+    bool divideByZero;
 
     double total;
 };

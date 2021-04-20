@@ -12,10 +12,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , pending_oper(false)
     , after_oper(false)
-    , total(0.0)
     , no_calc(true)
     , equal_done(false)
     , unary_op(false)
+    , divideByZero(false)
+    , total(0.0)
 {
     ui->setupUi(this);
     this->setWindowTitle("Calculator");
@@ -55,6 +56,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::digitClicked(QAbstractButton* button)
 {
+    if(divideByZero)
+        restoreFromDivisionByZero();
+
     //QPushButton* button = qobject_cast<QPushButton*>(sender());
     if(button->text() == "0" && lineEdit_empty() )
         return;
@@ -106,6 +110,9 @@ void MainWindow::digitClicked(QAbstractButton* button)
 
 void MainWindow::operatorClicked(QAbstractButton* button)
 {
+    if(divideByZero)
+        return;
+
     QString str = ui->lineEdit->text();
 
     if(str.endsWith("."))
@@ -151,6 +158,9 @@ void MainWindow::operatorClicked(QAbstractButton* button)
         ui->lineEdit->setText(QString::number(total));
 
         oper = button->text();
+
+        if(str == "0")
+            cantDivideByZero();
     }
     else if( ! lineEdit_empty() )
     {
@@ -176,76 +186,90 @@ void MainWindow::unaryOperatorClicked(QAbstractButton* button)
     QString operator_clicked = button->text();
 
 
-    if(! lineEdit_empty())
+    double num = ui->lineEdit->text().toDouble();
+    double oper_num;
+    QString str_op;
+
+    if(operator_clicked == tr("x\u00B2")) // power_2
     {
-        double num = ui->lineEdit->text().toDouble();
-        double oper_num;
-        QString str_op;
-
-        if(operator_clicked == tr("x\u00B2")) // power_2
-        {
-            oper_num = pow(num, 2);
-            str_op = "sqr(";
-        }
-        else if(operator_clicked == tr("\u221A")) // sqrt
-        {
-            oper_num = sqrt(num);
-            str_op = tr("\u221A") + "(";
-        }
-        else if(operator_clicked == "1/x") // one_divides
-        {
-            oper_num = 1/num;
-            str_op = "1/(";
-        }
-
-        ui->lineEdit->setText(QString::number(oper_num));
-
-        QString str = str_op + QString::number(num) + ")";
-        QString current_text = ui->lineEdit_2->text();
-        static QString s_str;
-        static QString s_current_text;
-
-        if( ! unary_op)
-        {
-            s_str = str;
-            s_current_text = current_text;
-        }
-
-        if(equal_done)
-        {
-            ui->lineEdit_2->setText(s_str);
-
-            s_current_text = "";
-
-            total = 0;
-
-            // ui->lineEdit->setText(QString::number(total));
-
-            equal_done = false;
-        }
-        else if(unary_op)
-        {
-            qDebug() << s_str;
-            qDebug() << "here";
-
-            s_str = str_op + s_str + ")";
-
-            ui->lineEdit_2->setText(s_current_text + s_str);
-        }
-        else
-        {
-            ui->lineEdit_2->setText(ui->lineEdit_2->text() + str);
-        }
-
-        unary_op = true;
+        oper_num = pow(num, 2);
+        str_op = "sqr(";
     }
+    else if(operator_clicked == tr("\u221A")) // sqrt
+    {
+        oper_num = sqrt(num);
+        str_op = tr("\u221A") + "(";
+    }
+    else if(operator_clicked == "1/x") // one_divides
+    {
+        if(num == 0)
+        {
+            ui->lineEdit_2->setText("1/(0)");
+            cantDivideByZero();
+            return;
+        }
+
+        oper_num = 1/num;
+        str_op = "1/(";
+    }
+
+    ui->lineEdit->setText(QString::number(oper_num));
+
+    QString str = str_op + QString::number(num) + ")";
+    QString current_text = ui->lineEdit_2->text();
+    static QString s_str;
+    static QString s_current_text;
+
+    if( ! unary_op)
+    {
+        s_str = str;
+        s_current_text = current_text;
+    }
+
+    if(equal_done)
+    {
+        ui->lineEdit_2->setText(s_str);
+
+        s_current_text = "";
+
+        total = 0;
+
+        // ui->lineEdit->setText(QString::number(total));
+
+        equal_done = false;
+    }
+    else if(unary_op)
+    {
+        s_str = str_op + s_str + ")";
+
+        ui->lineEdit_2->setText(s_current_text + s_str);
+    }
+    else
+    {
+        ui->lineEdit_2->setText(ui->lineEdit_2->text() + str);
+    }
+
+    unary_op = true;
+
 }
 
 void MainWindow::on_equals_clicked()
 {
     static QString right_operand;
 
+    if(divideByZero)
+    {
+        restoreFromDivisionByZero();
+        return;
+    }
+
     QString str = ui->lineEdit->text();
+
+    if(str == "0")
+    {
+        cantDivideByZero();
+        return;
+    }
 
     if(str.endsWith("."))
     {
@@ -443,11 +467,23 @@ bool MainWindow::lineEdit_empty()
 
 void MainWindow::on_clean_evryth_clicked()
 {
+    if(divideByZero)
+    {
+        restoreFromDivisionByZero();
+        return;
+    }
+
     clearAll();
 }
 
 void MainWindow::on_clean_input_clicked()
 {
+    if(divideByZero)
+    {
+        restoreFromDivisionByZero();
+        return;
+    }
+
     if(equal_done)
         clearAll();
     else
@@ -456,6 +492,12 @@ void MainWindow::on_clean_input_clicked()
 
 void MainWindow::on_backspsce_clicked()
 {
+    if(divideByZero)
+    {
+        restoreFromDivisionByZero();
+        return;
+    }
+
     if(! lineEdit_empty() && ! equal_done && ! pending_oper)
     {
         QString str = ui->lineEdit->text();
@@ -478,6 +520,7 @@ void MainWindow::on_change_sign_clicked()
 void MainWindow::clearAll()
 {
     ui->lineEdit->setText("0");
+    ui->lineEdit->setMaxLength(15);
     ui->lineEdit_2->clear();
 
     pending_oper = false;
@@ -489,4 +532,41 @@ void MainWindow::clearAll()
     oper = "";
 
     total = 0;
+}
+
+void MainWindow::cantDivideByZero()
+{
+    ui->lineEdit->setMaxLength(-1);
+    ui->lineEdit->setText("Can not divide by zero");
+
+    ui->divide->setEnabled(false);
+    ui->plus->setEnabled(false);
+    ui->minus->setEnabled(false);
+    ui->times->setEnabled(false);
+    ui->dot->setEnabled(false);
+    ui->change_sign->setEnabled(false);
+    ui->power_2->setEnabled(false);
+    ui->sqrt->setEnabled(false);
+    ui->one_divides->setEnabled(false);
+    ui->module->setEnabled(false);
+
+    divideByZero = true;
+}
+
+void MainWindow::restoreFromDivisionByZero()
+{
+    clearAll();
+
+    ui->divide->setEnabled(true);
+    ui->plus->setEnabled(true);
+    ui->minus->setEnabled(true);
+    ui->times->setEnabled(true);
+    ui->dot->setEnabled(true);
+    ui->change_sign->setEnabled(true);
+    ui->power_2->setEnabled(true);
+    ui->sqrt->setEnabled(true);
+    ui->one_divides->setEnabled(true);
+    ui->module->setEnabled(true);
+
+    divideByZero = false;
 }
