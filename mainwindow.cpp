@@ -265,8 +265,10 @@ void MainWindow::on_equals_clicked()
 
     QString str = ui->lineEdit->text();
 
-    if(str == "0")
+    if(((str == "0" && pending_oper) || (str == "0" && after_oper)) && oper == ui->divide->text() )
     {
+        pending_oper = after_oper = false;
+
         cantDivideByZero();
         return;
     }
